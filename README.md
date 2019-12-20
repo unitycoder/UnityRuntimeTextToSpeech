@@ -6,6 +6,9 @@ Quick project scrambled together from bits and pieces, to get free, non-windows-
 ## Unity version
 2018.3.13f1
 
+## Example Voice
+"Tweaky" https://soundcloud.com/user-689598301/unity-runtime-texttospeech-tts
+
 ## Pull requests
 Are accepted, but open issue first to describe your fixes or updates
 
