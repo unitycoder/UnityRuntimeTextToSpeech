@@ -6,9 +6,6 @@ Quick project scrambled together from bits and pieces, to get free, non-windows-
 ## Unity version
 2018.3.13f1
 
-## Known issues
-Crashes if exit application while its speaking
-
 ## Pull requests
 Are accepted, but open issue first to describe your fixes or updates
 
