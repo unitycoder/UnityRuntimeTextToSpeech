@@ -3,11 +3,13 @@ using UnityLibrary;
 
 public class TestSpeech : MonoBehaviour
 {
+    public string sayAtStart = "Welcome!";
+
     // Start is called before the first frame update
     void Start()
     {
         // TEST speech
-        Speech.instance.Say("Welcome!");
+        Speech.instance.Say(sayAtStart);
     }
 
     // Update is called once per frame

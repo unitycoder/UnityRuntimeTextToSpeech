@@ -12,6 +12,8 @@ namespace UnityLibrary
     [DefaultExecutionOrder(-100)]
     public class Speech : MonoBehaviour
     {
+        public string voiceID = "Tweaky";
+
         // singleton isntance
         public static Speech instance;
 
@@ -30,7 +32,6 @@ namespace UnityLibrary
             Client.Initialize(datafolder);
 
             // select voice
-            string voiceID = "Tweaky";
             var setvoice = Client.SetVoiceByName(voiceID);
             if (setvoice == false) Debug.Log("Failed settings voice: " + voiceID);
 
@@ -71,10 +72,10 @@ namespace UnityLibrary
         // adds string to TTS queue
         public void Say(string msg)
         {
-            if (isClosing == false && isRunning == true)
-            {
-                messages.Enqueue(msg);
-            }
+            if (isClosing == true || isRunning == false) return;
+            if (string.IsNullOrEmpty(msg)) return;
+
+            messages.Enqueue(msg);
         }
 
         private void OnDestroy()
