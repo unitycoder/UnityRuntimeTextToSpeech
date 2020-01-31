@@ -59,18 +59,44 @@ namespace ESpeakWrapper
 
         static bool Initialized = false;
 
+        public static int sampleRate;
+
         public static void Initialize(string path)
         {
-            var result = espeak_Initialize(AudioOutput.SynchronousPlayback, 0, path, 0);
-            //var result = espeak_Initialize(AudioOutput.Retrieval, 0, path, 0); // TODO allow receiving audio data..
+            //var result = espeak_Initialize(AudioOutput.SynchronousPlayback, 0, path, 0);
+            var result = espeak_Initialize(AudioOutput.Retrieval, 0, path, 0); // TODO allow receiving audio data..
             if (result == (int)Error.EE_INTERNAL_ERROR)
             {
                 throw new Exception(string.Format("Could not initialize ESpeak. Maybe there is no espeak data at {0}?", path));
+            } else {
+                sampleRate = result;
             }
 
             espeak_SetSynthCallback(EventHandler.Handle);
 
             Initialized = true;
+        }
+
+        public static bool VoiceFinished() {
+            bool ret = false;
+            EventHandler.audio_files_mutex.WaitOne();
+            if(EventHandler.audio_files.Count > 0) {
+                ret = true; 
+            }
+            EventHandler.audio_files_mutex.ReleaseMutex();
+            return ret;
+        }
+
+        public static byte[] PopVoice() {
+            byte[] ret = null;
+            EventHandler.audio_files_mutex.WaitOne();
+            if(EventHandler.audio_files.Count > 0) {
+                ret = EventHandler.audio_files[0];
+                EventHandler.audio_files.RemoveAt(0);
+            }
+            EventHandler.audio_files_mutex.ReleaseMutex();
+            return ret;
+            
         }
 
         public static bool SetRate(int rate)

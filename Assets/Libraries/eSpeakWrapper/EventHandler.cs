@@ -4,15 +4,20 @@ using System.Media;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace ESpeakWrapper
 {
     class EventHandler
     {
-
         public delegate int SynthCallback(IntPtr wavePtr, int bufferLength, IntPtr eventsPtr);
+        public delegate void OnVoiceFinished();
+
+        public static OnVoiceFinished ovf = null;
 
         static MemoryStream Stream;
+        public static Mutex audio_files_mutex = new Mutex();
+        public static List<byte[]> audio_files = new List<byte[]>();
 
         public static int Handle(IntPtr wavePtr, int bufferLength, IntPtr eventsPtr)
         {
@@ -22,14 +27,20 @@ namespace ESpeakWrapper
             // crash, but console log gets printed to output.log
             //Debug.Log("Buffer length is " + bufferLength);
 
+            //Assume that synthesiz is final if buffer length is zero?
             if (bufferLength == 0)
             {
                 //var file = new FileStream("alarm01.wav", FileMode.Open);
                 //Stream.Seek(0, SeekOrigin.Begin);
                 //file.CopyTo(Stream);
 
-                PlayAudio();
-                Console.Write(ConvertHeadersToString(Stream.GetBuffer()));
+                //PlayAudio();
+                //Console.Write(ConvertHeadersToString(Stream.GetBuffer()));
+
+                Stream.Flush();
+                audio_files_mutex.WaitOne();
+                audio_files.Add(Stream.ToArray());
+                audio_files_mutex.ReleaseMutex();
                 Stream.Dispose();
                 return 0;
             }
@@ -76,7 +87,7 @@ namespace ESpeakWrapper
             if (Stream == null)
             {
                 Stream = new MemoryStream();
-                InitializeStream();
+                //InitializeStream();
             }
 
             byte[] audio = new byte[bufferLength * 2];
@@ -86,6 +97,7 @@ namespace ESpeakWrapper
             return 0;
         }
 
+        /*
         static void InitializeStream()
         {
             var ascii = Encoding.ASCII;
@@ -115,7 +127,9 @@ namespace ESpeakWrapper
             // audio size: will fill this in the PlayAudio() method
             Stream.Write(BitConverter.GetBytes(0), 0, 4);
         }
+        */
 
+        /*
         static void PlayAudio()
         {
             Stream.Seek(4, SeekOrigin.Begin);
@@ -125,23 +139,28 @@ namespace ESpeakWrapper
             Stream.Write(BitConverter.GetBytes(Stream.Length - 44), 0, 4);
 
             Stream.Seek(0, SeekOrigin.Begin); // have to do this, otherwise the player will give a bogus error
-            var player = new SoundPlayer(Stream);
+            //var player = new SoundPlayer(Stream);
 
-            try
-            {
-                player.Play();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            //try
+            //{
+            //    player.Play();
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine(e);
+            //}
 
             // NOTE this gets always generated.. we dont need?
-            using (var file = new FileStream("test.wav", FileMode.Create))
-            {
-                Stream.WriteTo(file);
+            //using (var file = new FileStream("test.wav", FileMode.Create))
+            //{
+            //    Stream.WriteTo(file);
+            //}
+
+            if(ovf != null) {
+                ovf();
             }
         }
+        */
 
         static string PrintBytes(byte[] byteArray)
         {

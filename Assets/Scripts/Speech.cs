@@ -5,6 +5,7 @@ using System.IO;
 using ESpeakWrapper;
 using System.Threading;
 using System.Collections.Generic;
+using System;
 
 namespace UnityLibrary
 {
@@ -21,6 +22,10 @@ namespace UnityLibrary
         Queue<string> messages = new Queue<string>();
         bool isClosing = false;
         bool isRunning = false;
+
+        Mutex audio_list_mutex = new Mutex();
+        List<float[]> audio_files = new List<float[]>();
+        public AudioSource audio_source;
 
         void Awake()
         {
@@ -55,6 +60,18 @@ namespace UnityLibrary
 
                         // could use SSML also
                         //Client.SpeakSSML(msg);
+                        if(Client.VoiceFinished()) {
+                            byte[] new_voice = Client.PopVoice();
+                            float[] voice_float = new float[new_voice.Length/2];
+
+                            for(int i = 0; i < voice_float.Length; i++) {
+                                //if(BitConverter.IsLittleEndian) 
+                                voice_float[i] = (float)BitConverter.ToInt16(new_voice, i*2)/(float)short.MaxValue;
+                            }
+                            audio_list_mutex.WaitOne();      
+                            audio_files.Add(voice_float);
+                            audio_list_mutex.ReleaseMutex();
+                        }
                     }
                     catch (System.Exception e)
                     {
@@ -76,6 +93,25 @@ namespace UnityLibrary
             if (string.IsNullOrEmpty(msg)) return;
 
             messages.Enqueue(msg);
+        }
+
+        public void Update()
+        {
+            float[] data = null;
+            audio_list_mutex.WaitOne();
+            Debug.Log(audio_files.Count);
+            if(audio_files.Count > 0) {
+                data = audio_files[0];
+                audio_files.RemoveAt(0);
+            }
+            audio_list_mutex.ReleaseMutex();
+            if(data != null) {
+                AudioClip ac = AudioClip.Create("voice", data.Length, 1, Client.sampleRate, false);
+                ac.SetData(data,0);
+                audio_source.clip = ac;
+                audio_source.loop = true;
+                audio_source.Play();
+            }
         }
 
         private void OnDestroy()
