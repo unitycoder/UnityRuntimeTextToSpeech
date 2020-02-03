@@ -21,8 +21,8 @@ namespace ESpeakWrapper
 
         public static int Handle(IntPtr wavePtr, int bufferLength, IntPtr eventsPtr)
         {
-            Console.WriteLine("Received event!");
-            Console.WriteLine("Buffer length is " + bufferLength);
+            //Console.WriteLine("Received event!");
+            //Console.WriteLine("Buffer length is " + bufferLength);
 
             // crash, but console log gets printed to output.log
             //Debug.Log("Buffer length is " + bufferLength);
@@ -36,16 +36,18 @@ namespace ESpeakWrapper
 
                 //PlayAudio();
                 //Console.Write(ConvertHeadersToString(Stream.GetBuffer()));
-
-                Stream.Flush();
-                audio_files_mutex.WaitOne();
-                audio_files.Add(Stream.ToArray());
-                audio_files_mutex.ReleaseMutex();
-                Stream.Dispose();
+                if(Stream != null) {
+                    Stream.Flush();
+                    audio_files_mutex.WaitOne();
+                    audio_files.Add(Stream.ToArray());
+                    audio_files_mutex.ReleaseMutex();
+                    Stream.Dispose();
+                    Stream = null;
+                }
                 return 0;
+            } else {
+                WriteAudioToStream(wavePtr, bufferLength);
             }
-
-            WriteAudioToStream(wavePtr, bufferLength);
 
             var events = MarshalEvents(eventsPtr);
 

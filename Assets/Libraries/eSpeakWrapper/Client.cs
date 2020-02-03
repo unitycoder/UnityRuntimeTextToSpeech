@@ -106,7 +106,60 @@ namespace ESpeakWrapper
                 throw new Exception("The rate must be between 80 and 450.");
             }
 
-            var result = espeak_SetParameter(Parameter.Rate, rate, ParameterType.Absolute);
+            Error result = espeak_SetParameter(Parameter.Rate, rate, ParameterType.Absolute);
+            return CheckResult(result);
+        }
+
+        public static bool SetRange(int range) {
+            if(range < 0) {
+                range = 0;
+            } 
+            if(range > 100) {
+                range = 100;
+            }
+
+            Error result = espeak_SetParameter(Parameter.Range, range, ParameterType.Absolute);
+            return CheckResult(result);
+        }
+
+        public static bool SetPitch(int pitch) {
+            if(pitch < 0) {
+                pitch = 0;
+            }
+            if(pitch > 100) {
+                pitch = 100;
+            }
+
+            Error result = espeak_SetParameter(Parameter.Pitch, pitch, ParameterType.Absolute);
+            return CheckResult(result);
+        }
+
+        public static bool SetWordgap(int wordgap) {
+            if(wordgap < 0) {
+                wordgap = 0;
+            }
+            Error result = espeak_SetParameter(Parameter.WordGap, wordgap, ParameterType.Absolute);
+            return CheckResult(result);
+        }
+
+        public static bool SetVolume(int volume) {
+            if(volume < 0) {
+                volume = 0;
+            }
+            if(volume > 200) {
+                volume = 200;
+            }
+            Error result = espeak_SetParameter(Parameter.Volume, volume, ParameterType.Absolute);
+            return CheckResult(result);
+        }
+
+        public static bool SetIntonation(int intonation) {
+            Error result = espeak_SetParameter(Parameter.Intonation, intonation, ParameterType.Absolute);
+            return CheckResult(result);
+        }
+
+        public static bool SetCapitals(int capitals) {
+            Error result = espeak_SetParameter(Parameter.Capitals, capitals, ParameterType.Absolute);
             return CheckResult(result);
         }
 
