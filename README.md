@@ -6,11 +6,17 @@ Quick project scrambled together from bits and pieces, to get free, non-windows-
 ## Unity version
 2018.3.13f1
 
+## Windows
+Minimum version : Windows 8
+
 ## Example Voice
 "Tweaky" https://soundcloud.com/user-689598301/unity-runtime-texttospeech-tts
 
 ## Pull requests
 Are accepted, but open issue first to describe your fixes or updates
+
+## Unity Forum Thread
+https://forum.unity.com/threads/free-runtime-text-to-speech-plugin-windows-only.797310/
 
 ### dll manipulator license
 https://github.com/mcpiroman/UnityNativeTool/blob/master/LICENSE.txt
