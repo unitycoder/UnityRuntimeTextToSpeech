@@ -9,7 +9,8 @@ public class TestSpeech : MonoBehaviour
     void Start()
     {
         // TEST speech
-        Speech.instance.Say(sayAtStart);
+        Speech.instance.Say(sayAtStart, TTSCallback);
+
     }
 
     // Update is called once per frame
@@ -18,7 +19,17 @@ public class TestSpeech : MonoBehaviour
         // test pressing any keys to say that character
         if (Input.anyKeyDown)
         {
-            Speech.instance.Say(Input.inputString);
+            Speech.instance.Say(Input.inputString, TTSCallback);
         }
+    }
+
+    void TTSCallback(string message, AudioClip audio) {
+        AudioSource source = GetComponent<AudioSource>();
+        if(source == null) {
+            source = gameObject.AddComponent<AudioSource>();
+        }
+
+        source.clip = audio;
+        source.Play();
     }
 }

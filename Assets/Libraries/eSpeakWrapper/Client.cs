@@ -59,18 +59,44 @@ namespace ESpeakWrapper
 
         static bool Initialized = false;
 
+        public static int sampleRate;
+
         public static void Initialize(string path)
         {
-            var result = espeak_Initialize(AudioOutput.SynchronousPlayback, 0, path, 0);
-            //var result = espeak_Initialize(AudioOutput.Retrieval, 0, path, 0); // TODO allow receiving audio data..
+            //var result = espeak_Initialize(AudioOutput.SynchronousPlayback, 0, path, 0);
+            var result = espeak_Initialize(AudioOutput.Retrieval, 0, path, 0); // TODO allow receiving audio data..
             if (result == (int)Error.EE_INTERNAL_ERROR)
             {
                 throw new Exception(string.Format("Could not initialize ESpeak. Maybe there is no espeak data at {0}?", path));
+            } else {
+                sampleRate = result;
             }
 
             espeak_SetSynthCallback(EventHandler.Handle);
 
             Initialized = true;
+        }
+
+        public static bool VoiceFinished() {
+            bool ret = false;
+            EventHandler.audio_files_mutex.WaitOne();
+            if(EventHandler.audio_files.Count > 0) {
+                ret = true; 
+            }
+            EventHandler.audio_files_mutex.ReleaseMutex();
+            return ret;
+        }
+
+        public static byte[] PopVoice() {
+            byte[] ret = null;
+            EventHandler.audio_files_mutex.WaitOne();
+            if(EventHandler.audio_files.Count > 0) {
+                ret = EventHandler.audio_files[0];
+                EventHandler.audio_files.RemoveAt(0);
+            }
+            EventHandler.audio_files_mutex.ReleaseMutex();
+            return ret;
+            
         }
 
         public static bool SetRate(int rate)
@@ -80,7 +106,60 @@ namespace ESpeakWrapper
                 throw new Exception("The rate must be between 80 and 450.");
             }
 
-            var result = espeak_SetParameter(Parameter.Rate, rate, ParameterType.Absolute);
+            Error result = espeak_SetParameter(Parameter.Rate, rate, ParameterType.Absolute);
+            return CheckResult(result);
+        }
+
+        public static bool SetRange(int range) {
+            if(range < 0) {
+                range = 0;
+            } 
+            if(range > 100) {
+                range = 100;
+            }
+
+            Error result = espeak_SetParameter(Parameter.Range, range, ParameterType.Absolute);
+            return CheckResult(result);
+        }
+
+        public static bool SetPitch(int pitch) {
+            if(pitch < 0) {
+                pitch = 0;
+            }
+            if(pitch > 100) {
+                pitch = 100;
+            }
+
+            Error result = espeak_SetParameter(Parameter.Pitch, pitch, ParameterType.Absolute);
+            return CheckResult(result);
+        }
+
+        public static bool SetWordgap(int wordgap) {
+            if(wordgap < 0) {
+                wordgap = 0;
+            }
+            Error result = espeak_SetParameter(Parameter.WordGap, wordgap, ParameterType.Absolute);
+            return CheckResult(result);
+        }
+
+        public static bool SetVolume(int volume) {
+            if(volume < 0) {
+                volume = 0;
+            }
+            if(volume > 200) {
+                volume = 200;
+            }
+            Error result = espeak_SetParameter(Parameter.Volume, volume, ParameterType.Absolute);
+            return CheckResult(result);
+        }
+
+        public static bool SetIntonation(int intonation) {
+            Error result = espeak_SetParameter(Parameter.Intonation, intonation, ParameterType.Absolute);
+            return CheckResult(result);
+        }
+
+        public static bool SetCapitals(int capitals) {
+            Error result = espeak_SetParameter(Parameter.Capitals, capitals, ParameterType.Absolute);
             return CheckResult(result);
         }
 
