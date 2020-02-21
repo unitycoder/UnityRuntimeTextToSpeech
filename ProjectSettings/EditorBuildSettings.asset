@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/espeak.unity
+    path: Assets/Scenes/Speech-Example.unity
     guid: f0dd44d4f8eb0354987d6366a0f5479f
   m_configObjects: {}
