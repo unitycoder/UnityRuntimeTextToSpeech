@@ -10,7 +10,7 @@ Quick project scrambled together from bits and pieces, to get free, non-windows-
 Minimum version : Windows 8
 
 ### Alternatives
-https://github.com/unitycoder/UnityRuntimeTextToSpeech/wiki/Alternative-TTS-plugins
+[https://github.com/unitycoder/UnityRuntimeTextToSpeech/wiki/Alternative-TTS-plugins](https://github.com/unitycoder/UnityRuntimeTextToSpeech/wiki/Alternative-TTS-plugins-for-Unity)
 
 ## Example Voice
 "Tweaky" https://soundcloud.com/user-689598301/unity-runtime-texttospeech-tts
